@@ -1,6 +1,25 @@
 <?php
 require_once '../Config/config.php';
 
+// --- Helper functions (add if not already defined elsewhere) ---
+if (!function_exists('isLoggedIn')) {
+    function isLoggedIn() {
+        return isset($_SESSION['user_id']);
+    }
+}
+if (!function_exists('redirectTo')) {
+    function redirectTo($url) {
+        header("Location: $url");
+        exit;
+    }
+}
+if (!function_exists('formatRupiah')) {
+    function formatRupiah($angka) {
+        return 'Rp ' . number_format($angka, 0, ',', '.');
+    }
+}
+// --- End helper functions ---
+
 if (!isLoggedIn()) {
     redirectTo('index.php');
 }
