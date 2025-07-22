@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once '../Config/config.php';
 
 if (!isLoggedIn()) {
     redirectTo('index.php');
@@ -36,92 +36,9 @@ if (isLoggedIn()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARK Sentient - Marketplace Ternak</title>
+    <link href="../Asset/css/dashboard.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.8rem;
-        }
-        .hero-section {
-            background: linear-gradient(135deg, #71b142 0%, #5a8f37 100%);
-            color: white;
-            padding: 80px 0;
-            margin-bottom: 50px;
-        }
-        .category-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        .livestock-card {
-            transition: all 0.3s ease;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            height: 100%;
-        }
-        .livestock-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        .livestock-image {
-            height: 200px;
-            object-fit: cover;
-            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: #666;
-        }
-        .price-tag {
-            background: linear-gradient(135deg, #71b142 0%, #5a8f37 100%);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #71b142 0%, #5a8f37 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 10px 25px;
-            font-weight: 600;
-        }
-        .badge-location {
-            background: #f8f9fa;
-            color: #6c757d;
-            border-radius: 15px;
-        }
-        .sidebar {
-            background: #f8f9fa;
-            min-height: 100vh;
-            padding-top: 20px;
-        }
-        .sidebar .nav-link {
-            color: #2c5530;
-            font-weight: 500;
-            padding: 12px 20px;
-            margin-bottom: 5px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            background: linear-gradient(135deg, #71b142 0%, #5a8f37 100%);
-            color: white;
-        }
-        .sidebar .nav-link i {
-            width: 20px;
-            margin-right: 10px;
-        }
-    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -176,7 +93,7 @@ if (isLoggedIn()) {
                 </ul>
             </div>
         </div>
-    </div>
+    </nav>
 
     <!-- Toast for notifications -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -192,39 +109,6 @@ if (isLoggedIn()) {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function addToCart(livestockId) {
-            fetch('add_to_cart.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'livestock_id=' + livestockId
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update cart count
-                    location.reload();
-                    // Show toast
-                    const toast = new bootstrap.Toast(document.getElementById('cartToast'));
-                    toast.show();
-                } else {
-                    alert(data.message || 'Gagal menambahkan ke keranjang');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat menambahkan ke keranjang');
-            });
-        }
-    </script>
-</body>
-</html>>
-        </div>
-    </nav>
-
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -237,7 +121,7 @@ if (isLoggedIn()) {
                                 <i class="fas fa-cow"></i><?php echo $category['name']; ?>
                             </a>
                         <?php endforeach; ?>
-                        <a class="nav-link" href="cart.php">
+                        <a class="nav-link" href="../Views/cart.php">
                             <i class="fas fa-shopping-cart"></i>Cart
                         </a>
                     </nav>
@@ -314,4 +198,59 @@ if (isLoggedIn()) {
                         <?php endforeach; ?>
                     </div>
                 </div>
-            </div
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function addToCart(livestockId) {
+            fetch('../Controllers/add_to_cart.php', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'livestock_id=' + livestockId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show toast notification
+                    const toastElement = document.getElementById('cartToast');
+                    const toast = new bootstrap.Toast(toastElement);
+                    toast.show();
+                    
+                    // Update cart count badge
+                    updateCartBadge(data.cart_count);
+                } else {
+                    alert(data.message || 'Gagal menambahkan ke keranjang');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menambahkan ke keranjang');
+            });
+        }
+
+        function updateCartBadge(count) {
+            const cartLink = document.querySelector('.nav-link.position-relative');
+            let badge = cartLink.querySelector('.badge');
+            
+            if (count > 0) {
+                if (!badge) {
+                    // Create badge if it doesn't exist
+                    badge = document.createElement('span');
+                    badge.className = "position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger";
+                    cartLink.appendChild(badge);
+                }
+                badge.textContent = count;
+                badge.style.display = 'inline-block';
+            } else {
+                if (badge) {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

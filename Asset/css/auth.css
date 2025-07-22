@@ -1,0 +1,63 @@
+/* auth.css - Styling untuk halaman login dan register */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.login-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.farm-image {
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%23f0f8ff" width="1200" height="800"/><rect fill="%23228b22" y="600" width="1200" height="200"/><circle fill="%23ffd700" cx="200" cy="150" r="80"/><polygon fill="%238b4513" points="400,400 500,300 600,400 600,500 400,500"/><polygon fill="%23dc143c" points="480,280 500,260 520,280 520,310 480,310"/><rect fill="%23654321" x="490" y="400" width="20" height="100"/><ellipse fill="%23ffffff" cx="800" cy="450" rx="60" ry="40"/><ellipse fill="%23000000" cx="820" cy="440" rx="8" ry="8"/><path fill="%23ffc0cb" d="M780,460 Q790,470 800,460"/></svg>') center/cover;
+    min-height: 100vh;
+}
+
+.brand-logo {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2c5530;
+    margin-bottom: 0.5rem;
+}
+
+.login-form {
+    padding: 3rem;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #71b142 0%, #5a8f37 100%);
+    border: none;
+    border-radius: 25px;
+    padding: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-social {
+    border-radius: 25px;
+    padding: 12px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #71b142;
+    box-shadow: 0 0 0 0.2rem rgba(113, 177, 66, 0.25);
+}
+
+.alert {
+    border-radius: 10px;
+}

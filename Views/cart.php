@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once '../Config/config.php';
 
 if (!isLoggedIn()) {
     redirectTo('index.php');
@@ -61,83 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - ARK Sentient</title>
+    <link href="../Asset/css/cart.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.8rem;
-        }
-        .cart-item {
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .cart-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .quantity-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 1px solid #dee2e6;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .quantity-btn:hover {
-            background: #f8f9fa;
-        }
-        .summary-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .btn-checkout {
-            background: linear-gradient(135deg, #71b142 0%, #5a8f37 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 15px 30px;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .sidebar {
-            background: #f8f9fa;
-            min-height: 100vh;
-            padding-top: 20px;
-        }
-        .sidebar .nav-link {
-            color: #2c5530;
-            font-weight: 500;
-            padding: 12px 20px;
-            margin-bottom: 5px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            background: linear-gradient(135deg, #71b142 0%, #5a8f37 100%);
-            color: white;
-        }
-        .sidebar .nav-link i {
-            width: 20px;
-            margin-right: 10px;
-        }
-    </style>
 </head>
 <body class="bg-light">
     <!-- Navigation -->

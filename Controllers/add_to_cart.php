@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once '../Config/config.php';
 
 header('Content-Type: application/json');
 
@@ -47,7 +47,16 @@ try {
         $stmt->execute([$user_id, $livestock_id]);
     }
     
-    echo json_encode(['success' => true, 'message' => 'Item added to cart successfully']);
+    // Get updated cart count
+    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM cart WHERE user_id = ?");
+    $stmt->execute([$user_id]);
+    $cart_count = $stmt->fetchColumn();
+    
+    echo json_encode([
+        'success' => true, 
+        'message' => 'Item added to cart successfully',
+        'cart_count' => $cart_count
+    ]);
     
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
