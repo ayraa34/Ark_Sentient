@@ -74,7 +74,7 @@
                     <div class="text-center">
                         <small>
                             <strong>Demo Login:</strong><br>
-                            <strong>Username:</strong> admin | <strong>Password:</strong> password<br>
+                            <strong>Username:</strong> admin | <strong>Password</strong> 123<br>
                             <strong>Username:</strong> farmer1 | <strong>Password:</strong> password<br>
                             <strong>Username:</strong> customer1 | <strong>Password:</strong> password
                         </small>
@@ -86,31 +86,29 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Form submission handler
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            
+
             if (!username || !password) {
                 showAlert('Username dan password wajib diisi', 'danger');
                 return;
             }
-            
+
             // Demo validation
             const demoUsers = {
-                'admin': 'password',
+                'admin': '123',
                 'farmer1': 'password',
                 'customer1': 'password'
             };
-            
+
             if (demoUsers[username] && demoUsers[username] === password) {
                 showAlert('Login berhasil! Redirecting...', 'success');
-                setTimeout(() => {
-                    // In real implementation, redirect to dashboard
-                    console.log('Redirecting to dashboard...');
-                }, 1500);
+                setTimeout(function() {
+                    window.location.href = "./Views/dashboard.php";
+                }, 500);
             } else {
                 showAlert('Username atau password salah', 'danger');
             }

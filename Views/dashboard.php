@@ -1,28 +1,6 @@
 <?php
 require_once '../Config/config.php';
 
-// --- Helper functions (add if not already defined elsewhere) ---
-if (!function_exists('isLoggedIn')) {
-    function isLoggedIn() {
-        return isset($_SESSION['user_id']);
-    }
-}
-if (!function_exists('redirectTo')) {
-    function redirectTo($url) {
-        header("Location: $url");
-        exit;
-    }
-}
-if (!function_exists('formatRupiah')) {
-    function formatRupiah($angka) {
-        return 'Rp ' . number_format($angka, 0, ',', '.');
-    }
-}
-// --- End helper functions ---
-
-if (!isLoggedIn()) {
-    redirectTo('index.php');
-}
 
 // Get livestock data
 $stmt = $pdo->prepare("
@@ -100,7 +78,8 @@ if (isLoggedIn()) {
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-1"></i><?php echo $_SESSION['full_name']; ?>
+                            <i class="fas fa-user-circle me-1"></i>
+                            <?php echo isset($_SESSION['full_name']) ? htmlspecialchars($_SESSION['full_name']) : htmlspecialchars($_SESSION['username'] ?? 'User'); ?>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
@@ -232,7 +211,7 @@ if (isLoggedIn()) {
                 body: 'livestock_id=' + livestockId
             })
             .then(response => response.json())
-            .then(data => {
+            .then(function(data) {
                 if (data.success) {
                     // Show toast notification
                     const toastElement = document.getElementById('cartToast');
@@ -245,7 +224,7 @@ if (isLoggedIn()) {
                     alert(data.message || 'Gagal menambahkan ke keranjang');
                 }
             })
-            .catch(error => {
+            .catch(function(error) {
                 console.error('Error:', error);
                 alert('Terjadi kesalahan saat menambahkan ke keranjang');
             });
