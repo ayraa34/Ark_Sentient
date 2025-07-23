@@ -17,7 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['full_name'] = $user['full_name'];
-        header('Location: Views/dashboard.php');
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['email'] = $user['email'];
+        // ...tambahkan data lain jika perlu...
+        header('Location: Views/home.php');
         exit;
     } else {
         $error = 'Username atau password salah';
