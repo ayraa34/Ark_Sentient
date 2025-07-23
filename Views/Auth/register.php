@@ -1,6 +1,10 @@
 <?php
 require_once '../../Config/config.php';
 
+function sanitizeInput($data) {
+    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+}
+
 $error = '';
 $success = '';
 

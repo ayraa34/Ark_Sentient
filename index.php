@@ -1,3 +1,29 @@
+<?php
+session_start();
+require_once 'Config/config.php'; // Pastikan path dan koneksi benar
+
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+
+    // Query user dari database
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['password'])) {
+        // Login berhasil
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['full_name'] = $user['full_name'];
+        header('Location: Views/dashboard.php');
+        exit;
+    } else {
+        $error = 'Username atau password salah';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,7 +34,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="asset/css/auth.css" rel="stylesheet">
 </head>
-<body></body>
+<body>
     <div class="login-container">
         <!-- Left side - Farm image -->
         <div class="left-section">
@@ -22,32 +48,27 @@
         <!-- Right side - Login form -->
         <div class="right-section">
             <div class="login-form-container">
-                <div class="brand-header">
-                    <div class="brand-logo">
-                        <div class="brand-icon">
-                            <i class="fas fa-seedling"></i>
-                        </div>
-                        ARK Sentient
+                <div class="brand-header text-center">
+                    <div class="brand-logo d-flex align-items-center justify-content-center mb-2">
+                        <img src="Asset/icon/logoweb.png" alt="Logo" style="height:40px;width:40px;background:none;object-fit:contain;margin-right:12px;">
+                        <span class="fw-bold fs-4" style="color:#388e3c;">ARK Sentient</span>
                     </div>
-                    <h2 class="login-title">Login</h2>
+                    <h2 class="login-title mt-3">Login</h2>
                 </div>
-                
-                <!-- Alert messages would go here -->
-                <div id="alertContainer"></div>
-                
-                <form id="loginForm">
+                <?php if ($error): ?>
+                    <div class="alert alert-danger mt-2"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
+                <form method="post" id="loginForm">
                     <div class="form-group">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" 
+                        <input type="text" class="form-control" id="username" name="username"
                                placeholder="Enter your username" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" 
+                        <input type="password" class="form-control" id="password" name="password"
                                placeholder="Enter your password" required>
                     </div>
-                    
                     <button type="submit" class="btn btn-login">
                         Login
                     </button>
@@ -85,55 +106,5 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                showAlert('Username dan password wajib diisi', 'danger');
-                return;
-            }
-
-            // Demo validation
-            const demoUsers = {
-                'admin': '123',
-                'farmer1': 'password',
-                'customer1': 'password'
-            };
-
-            if (demoUsers[username] && demoUsers[username] === password) {
-                showAlert('Login berhasil! Redirecting...', 'success');
-                setTimeout(function() {
-                    window.location.href = "./Views/dashboard.php";
-                }, 500);
-            } else {
-                showAlert('Username atau password salah', 'danger');
-            }
-        });
-        
-        function showAlert(message, type) {
-            const alertContainer = document.getElementById('alertContainer');
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-            alertDiv.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alertDiv);
-            
-            // Auto dismiss after 5 seconds
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.remove();
-                }
-            }, 5000);
-        }
-    </script>
 </body>
 </html>

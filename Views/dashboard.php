@@ -1,9 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) session_start();
 require_once '../Config/config.php';
 
-
 // Get livestock data
-$stmt = $pdo->prepare("
+$stmt = $conn->prepare("
     SELECT l.*, c.name as category_name, u.full_name as farmer_name 
     FROM livestock l 
     JOIN categories c ON l.category_id = c.id 
@@ -16,13 +16,13 @@ $stmt->execute();
 $livestock = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get categories
-$stmt = $pdo->query("SELECT * FROM categories ORDER BY name");
+$stmt = $conn->query("SELECT * FROM categories ORDER BY name");
 $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get cart count
 $cart_count = 0;
 if (isLoggedIn()) {
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM cart WHERE user_id = ?");
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM cart WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $cart_count = $stmt->fetchColumn();
 }
@@ -79,7 +79,12 @@ if (isLoggedIn()) {
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle me-1"></i>
-                            <?php echo isset($_SESSION['full_name']) ? htmlspecialchars($_SESSION['full_name']) : htmlspecialchars($_SESSION['username'] ?? 'User'); ?>
+                            <?php
+                            $user_display = isset($_SESSION['full_name']) && $_SESSION['full_name'] !== ''
+                                ? htmlspecialchars($_SESSION['full_name'])
+                                : (isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User');
+                            echo $user_display;
+                            ?>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
