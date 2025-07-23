@@ -14,28 +14,21 @@ try {
     die("Connection failed: " . $e->getMessage());
 }
 
-// Helper functions
-function isLoggedIn() {
-    return isset($_SESSION['user_id']);
+// --- Helper functions ---
+if (!function_exists('isLoggedIn')) {
+    function isLoggedIn() {
+        return isset($_SESSION['user_id']);
+    }
 }
-
-function getUserRole() {
-    return isset($_SESSION['role']) ? $_SESSION['role'] : null;
+if (!function_exists('redirectTo')) {
+    function redirectTo($url) {
+        header("Location: $url");
+        exit;
+    }
 }
-
-function formatRupiah($number) {
-    return 'Rp ' . number_format($number, 0, ',', '.');
+if (!function_exists('formatRupiah')) {
+    function formatRupiah($angka) {
+        return 'Rp ' . number_format($angka, 0, ',', '.');
+    }
 }
-
-function redirectTo($url) {
-    header("Location: $url");
-    exit();
-}
-
-function sanitizeInput($data) {
-    return htmlspecialchars(strip_tags(trim($data)));
-}
-
-// Base URL
-define('BASE_URL', 'http://localhost/ark_sentient/');
 ?>

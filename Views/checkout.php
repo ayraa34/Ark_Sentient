@@ -5,6 +5,14 @@ if (!isLoggedIn()) {
     redirectTo('index.php');
 }
 
+// --- Helper function for input sanitization ---
+if (!function_exists('sanitizeInput')) {
+    function sanitizeInput($data) {
+        return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+    }
+}
+// --- End helper function ---
+
 // Get cart items
 $stmt = $pdo->prepare("
     SELECT c.*, l.name, l.breed, l.price, l.age_months, l.weight_kg, l.location
