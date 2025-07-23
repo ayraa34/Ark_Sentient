@@ -1,11 +1,12 @@
 <?php
 require_once '../Config/config.php';
+if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../index.php');
     exit;
 }
 // Ambil data user dari database
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
