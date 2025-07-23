@@ -2,6 +2,11 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once '../Config/config.php';
 
+if (!isLoggedIn()) {
+    header('Location: ../index.php');
+    exit;
+}
+
 // Get livestock data
 $stmt = $conn->prepare("
     SELECT l.*, c.name as category_name, u.full_name as farmer_name 
@@ -41,7 +46,7 @@ if (isLoggedIn()) {
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand text-success" href="dashboard.php">
+            <a class="navbar-brand text-success" href="home.php">
                 <i class="fas fa-seedling me-2"></i>ARK Sentient
             </a>
             

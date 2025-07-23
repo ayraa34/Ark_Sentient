@@ -1,12 +1,13 @@
 <?php
 require_once '../Config/config.php';
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 if (!isLoggedIn()) {
     redirectTo('index.php');
 }
 
 // Get cart items
-$stmt = $pdo->prepare("
+$stmt = $conn->prepare("
     SELECT c.*, l.name, l.breed, l.price, l.age_months, l.weight_kg, l.location
     FROM cart c 
     JOIN livestock l ON c.livestock_id = l.id 
@@ -36,10 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_quantity = (int)$_POST['quantity'];
         
         if ($new_quantity > 0) {
-            $stmt = $pdo->prepare("UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?");
+            $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?");
             $stmt->execute([$new_quantity, $cart_id, $_SESSION['user_id']]);
         } else {
-            $stmt = $pdo->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
+            $stmt = $conn->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
             $stmt->execute([$cart_id, $_SESSION['user_id']]);
         }
         
@@ -48,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (isset($_POST['remove_item'])) {
         $cart_id = (int)$_POST['cart_id'];
-        $stmt = $pdo->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
+        $stmt = $conn->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
         $stmt->execute([$cart_id, $_SESSION['user_id']]);
         
         redirectTo('cart.php');

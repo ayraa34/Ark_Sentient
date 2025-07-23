@@ -1,11 +1,12 @@
 <?php
 require_once '../Config/config.php';
-if (!isset($_SESSION['user_id'])) {
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (!isLoggedIn()) {
     header('Location: ../index.php');
     exit;
 }
 // Ambil data pesanan user
-$stmt = $pdo->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
+$stmt = $conn->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
 $stmt->execute([$_SESSION['user_id']]);
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
