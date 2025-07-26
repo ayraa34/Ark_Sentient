@@ -31,6 +31,28 @@ if (isLoggedIn()) {
     $stmt->execute([$_SESSION['user_id']]);
     $cart_count = $stmt->fetchColumn();
 }
+
+// Fitur search
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+if ($search_query !== '') {
+    $stmt = $conn->prepare("
+        SELECT l.*, c.name as category_name, u.full_name as farmer_name 
+        FROM livestock l 
+        JOIN categories c ON l.category_id = c.id 
+        JOIN users u ON l.farmer_id = u.id 
+        WHERE l.status = 'available'
+        AND (
+            l.name LIKE ? OR
+            l.breed LIKE ? OR
+            l.location LIKE ?
+        )
+        ORDER BY l.created_at DESC
+        LIMIT 12
+    ");
+    $like = '%' . $search_query . '%';
+    $stmt->execute([$like, $like, $like]);
+    $livestock = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -157,12 +179,12 @@ if (isLoggedIn()) {
                 <div class="container mb-4">
                     <div class="row justify-content-center">
                         <div class="col-md-8">
-                            <div class="input-group">
-                                <input type="text" class="form-control form-control-lg" placeholder="Search livestock...">
-                                <button class="btn btn-primary" type="button">
+                            <form class="input-group" method="get" action="dashboard.php">
+                                <input type="text" class="form-control form-control-lg" name="search" placeholder="Search livestock..." value="<?php echo htmlspecialchars($search_query); ?>">
+                                <button class="btn btn-primary" type="submit">
                                     <i class="fas fa-search"></i>
                                 </button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -224,8 +224,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <span><?php echo formatRupiah($tax_amount); ?></span>
                                     </div>
                                     
-                                    <hr>
-                                    
                                     <div class="d-flex justify-content-between mb-3">
                                         <strong>Total</strong>
                                         <strong class="text-success"><?php echo formatRupiah($total); ?></strong>

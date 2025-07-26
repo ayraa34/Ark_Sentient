@@ -312,7 +312,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                     <p class="text-muted">Your trusted livestock marketplace</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <p class="text-muted">&copy; 2024 ARK Sentient. All rights reserved.</p>
+                    <p class="text-muted">&copy; 2025 ARK Sentient. All rights reserved.</p>
                 </div>
             </div>
         </div>
