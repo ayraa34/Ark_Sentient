@@ -6,6 +6,13 @@ if (!isLoggedIn()) {
     redirectTo('index.php');
 }
 
+// Pastikan koneksi database menggunakan variabel yang benar
+// Jika di config.php variabelnya $conn, gunakan $conn, bukan $pdo
+$db = isset($pdo) ? $pdo : (isset($conn) ? $conn : null);
+if (!$db) {
+    die('Database connection not found.');
+}
+
 // --- Helper function for input sanitization ---
 if (!function_exists('sanitizeInput')) {
     function sanitizeInput($data) {
@@ -15,7 +22,7 @@ if (!function_exists('sanitizeInput')) {
 // --- End helper function ---
 
 // Get cart items
-$stmt = $pdo->prepare("
+$stmt = $db->prepare("
     SELECT c.*, l.name, l.breed, l.price, l.age_months, l.weight_kg, l.location
     FROM cart c 
     JOIN livestock l ON c.livestock_id = l.id 
@@ -35,11 +42,10 @@ foreach ($cart_items as $item) {
 }
 
 $shipping_cost = 200000;
-$tax_rate = 0.11;
+$tax_rate = 0.10; // Pajak 10%
 $tax_amount = $subtotal * $tax_rate;
-$discount_rate = 0.05;
-$discount_amount = $subtotal * $discount_rate;
-$total = $subtotal + $shipping_cost + $tax_amount - $discount_amount;
+// Hapus diskon new member
+$total = $subtotal + $shipping_cost + $tax_amount;
 
 // Handle form submission
 $order_success = false;
@@ -50,26 +56,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $notes = sanitizeInput($_POST['notes'] ?? '');
     
     try {
-        $pdo->beginTransaction();
+        $db->beginTransaction();
         
         // Create order
         $order_number = 'ORD-' . date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
         
-        $stmt = $pdo->prepare("
+        $stmt = $db->prepare("
             INSERT INTO orders (user_id, order_number, total_amount, shipping_cost, tax_amount, 
                               discount_amount, final_amount, payment_method, shipping_address, notes)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $_SESSION['user_id'], $order_number, $subtotal, $shipping_cost, 
-            $tax_amount, $discount_amount, $total, $payment_method, $shipping_address, $notes
+            $tax_amount, 0, $total, $payment_method, $shipping_address, $notes // discount_amount = 0
         ]);
         
-        $order_id = $pdo->lastInsertId();
+        $order_id = $db->lastInsertId();
         
         // Add order items
         foreach ($cart_items as $item) {
-            $stmt = $pdo->prepare("
+            $stmt = $db->prepare("
                 INSERT INTO order_items (order_id, livestock_id, quantity, unit_price, total_price)
                 VALUES (?, ?, ?, ?, ?)
             ");
@@ -80,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
         }
         
         // Clear cart
-        $stmt = $pdo->prepare("DELETE FROM cart WHERE user_id = ?");
+        $stmt = $db->prepare("DELETE FROM cart WHERE user_id = ?");
         $stmt->execute([$_SESSION['user_id']]);
         
-        $pdo->commit();
+        $db->commit();
 
         // Set flag for order summary
         $order_success = true;
@@ -92,13 +98,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
         // redirectTo('payment.php?order=' . $order_number);
 
     } catch (Exception $e) {
-        $pdo->rollBack();
+        $db->rollBack();
         $error = 'Failed to create order: ' . $e->getMessage();
     }
 }
 
 // Get user data
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
@@ -143,19 +149,44 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 <?php endif; ?>
 
                 <?php if ($order_success): ?>
-                    <div class="alert alert-success">
-                        <h4 class="alert-heading"><i class="fas fa-check-circle me-2"></i>Order Placed Successfully!</h4>
-                        <p>Your order <strong><?php echo htmlspecialchars($order_number); ?></strong> has been placed.</p>
+                    <div class="alert alert-success mt-4">
+                        <div class="text-center">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h3 class="mb-2">Order Berhasil!</h3>
+                            <p>Terima kasih telah melakukan pemesanan di <strong>ARK Sentient</strong>.</p>
+                        </div>
                         <hr>
-                        <h5>Order Summary</h5>
-                        <ul>
-                            <li><strong>Order Number:</strong> <?php echo htmlspecialchars($order_number); ?></li>
-                            <li><strong>Total:</strong> <?php echo formatRupiah($total); ?></li>
-                            <li><strong>Payment Method:</strong> <?php echo htmlspecialchars($payment_method); ?></li>
-                            <li><strong>Shipping Address:</strong> <?php echo htmlspecialchars($shipping_address); ?></li>
-                        </ul>
-                        <a href="dashboard.php" class="btn btn-success mt-3">Back to Marketplace</a>
-                        <a href="orders.php" class="btn btn-outline-primary mt-3">View My Orders</a>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Detail Order</h5>
+                                <ul class="list-unstyled mb-3">
+                                    <li><strong>No. Order:</strong> <?php echo htmlspecialchars($order_number); ?></li>
+                                    <li><strong>Total:</strong> <?php echo formatRupiah($total); ?></li>
+                                    <li><strong>Metode Pembayaran:</strong> <?php echo htmlspecialchars($payment_method); ?></li>
+                                    <li><strong>Alamat Pengiriman:</strong> <?php echo htmlspecialchars($shipping_address); ?></li>
+                                    <?php if (!empty($notes)): ?>
+                                        <li><strong>Catatan:</strong> <?php echo htmlspecialchars($notes); ?></li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Ringkasan Barang</h5>
+                                <ul class="list-group mb-3">
+                                    <?php foreach ($cart_items as $item): ?>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>
+                                                <?php echo htmlspecialchars($item['name']); ?> (<?php echo $item['quantity']; ?>x)
+                                        </span>
+                                        <span><?php echo formatRupiah($item['price'] * $item['quantity']); ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="dashboard.php" class="btn btn-success me-2"><i class="fas fa-home me-1"></i> Kembali ke Marketplace</a>
+                            <a href="orders.php" class="btn btn-outline-success"><i class="fas fa-list me-1"></i> Lihat Pesanan Saya</a>
+                        </div>
                     </div>
                 <?php else: ?>
                     <form method="POST">
@@ -243,24 +274,16 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                             <span>Subtotal</span>
                             <span><?php echo formatRupiah($subtotal); ?></span>
                         </div>
-                        
                         <div class="d-flex justify-content-between mb-2">
                             <span>Shipping</span>
                             <span><?php echo formatRupiah($shipping_cost); ?></span>
                         </div>
-                        
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Taxes (11%)</span>
+                            <span>Taxes (10%)</span>
                             <span><?php echo formatRupiah($tax_amount); ?></span>
                         </div>
-                        
-                        <div class="d-flex justify-content-between mb-2 text-success">
-                            <span>Discount (New Member) (5%)</span>
-                            <span>-<?php echo formatRupiah($discount_amount); ?></span>
-                        </div>
-                        
+                        <!-- Hapus diskon new member -->
                         <hr>
-                        
                         <div class="d-flex justify-content-between fs-5 fw-bold">
                             <span>Total</span>
                             <span><?php echo formatRupiah($total); ?></span>

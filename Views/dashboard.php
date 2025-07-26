@@ -60,10 +60,10 @@ if (isLoggedIn()) {
                         <a class="nav-link" href="dashboard.php">Marketplace Ternak</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pemeriksaan Ternak</a>
+                        <a class="nav-link" href="../Views/priksaternak.php">Pemeriksaan Ternak</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Smart Assistant</a>
+                        <a class="nav-link" href="../Views/smartasis.php">Smart Assistant</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">History</a>
@@ -218,9 +218,20 @@ if (isLoggedIn()) {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'livestock_id=' + livestockId
+                body: new URLSearchParams({ livestock_id: livestockId }).toString()
             })
-            .then(response => response.json())
+            .then(async response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    throw new Error('Invalid JSON response');
+                }
+                return data;
+            })
             .then(function(data) {
                 if (data.success) {
                     // Show toast notification
@@ -236,7 +247,7 @@ if (isLoggedIn()) {
             })
             .catch(function(error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan saat menambahkan ke keranjang');
+                alert('Terjadi kesalahan saat menambahkan ke keranjang: ' + error.message);
             });
         }
 

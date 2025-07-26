@@ -1,14 +1,33 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+// Inisialisasi cart_count
+$cart_count = 0;
+if (isset($_SESSION['user_id'])) {
+    require_once '../Config/config.php';
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM cart WHERE user_id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $cart_count = $stmt->fetchColumn();
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARK Sentient - Smart Livestock Management</title>
+    <title>ARK Sentient - Home Page</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="../Asset/css/home.css" rel="stylesheet">
+    <style>
+        /* Dropdown menu always on top */
+        .navbar .dropdown-menu {
+            z-index: 1050;
+            position: absolute;
+        }
+    </style>
 </head>
 <body>
     <?php
@@ -46,7 +65,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand text-success" href="dashboard.php">
+            <a class="navbar-brand text-success" href="home.php">
                 <i class="fas fa-seedling me-2"></i>ARK Sentient
             </a>
             
@@ -60,10 +79,10 @@
                         <a class="nav-link" href="dashboard.php">Marketplace Ternak</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pemeriksaan Ternak</a>
+                        <a class="nav-link" href="../Views/priksaternak.php">Pemeriksaan Ternak</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Smart Assistant</a>
+                        <a class="nav-link" href="../Views/smartasis.php">Smart Assistant</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">History</a>
@@ -74,19 +93,28 @@
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="cart.php">
                             <i class="fas fa-shopping-cart"></i>
-                            <!-- Cart badge can be added here if needed -->
+                            <?php if ($cart_count > 0): ?>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    <?php echo $cart_count; ?>
+                                </span>
+                            <?php endif; ?>
                         </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle me-1"></i>
-                            User
+                            <?php
+                            $user_display = isset($_SESSION['full_name']) && $_SESSION['full_name'] !== ''
+                                ? htmlspecialchars($_SESSION['full_name'])
+                                : (isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'User');
+                            echo $user_display;
+                            ?>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-list me-2"></i>My Orders</a></li>
+                            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="orders.php"><i class="fas fa-list me-2"></i>My Orders</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>
                     </li>
                 </ul>

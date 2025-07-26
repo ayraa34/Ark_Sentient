@@ -24,11 +24,9 @@ foreach ($cart_items as $item) {
 }
 
 $shipping_cost = 200000; // Fixed shipping cost
-$tax_rate = 0.11; // 11% tax
+$tax_rate = 0.10; // 10% tax
 $tax_amount = $subtotal * $tax_rate;
-$discount_rate = 0.05; // 5% discount for new members
-$discount_amount = $subtotal * $discount_rate;
-$total = $subtotal + $shipping_cost + $tax_amount - $discount_amount;
+$total = $subtotal + $shipping_cost + $tax_amount;
 
 // Handle cart updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -84,10 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <a class="nav-link" href="dashboard.php">Marketplace Ternak</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pemeriksaan Ternak</a>
+                        <a class="nav-link" href="../Views/priksaternak.php">Pemeriksaan Ternak</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Smart Assistant</a>
+                        <a class="nav-link" href="../Views/smartasis.php">Smart Assistant</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">History</a>
@@ -222,13 +220,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                     
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span>Taxes (11%)</span>
+                                        <span>Taxes (10%)</span>
                                         <span><?php echo formatRupiah($tax_amount); ?></span>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-between mb-2 text-success">
-                                        <span>Discount (New Member - 5%)</span>
-                                        <span>-<?php echo formatRupiah($discount_amount); ?></span>
                                     </div>
                                     
                                     <hr>

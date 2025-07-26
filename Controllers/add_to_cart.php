@@ -19,7 +19,7 @@ $user_id = $_SESSION['user_id'];
 
 try {
     // Check if livestock exists and is available
-    $stmt = $pdo->prepare("SELECT id, name, status FROM livestock WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, name, status FROM livestock WHERE id = ?");
     $stmt->execute([$livestock_id]);
     $livestock = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -34,22 +34,22 @@ try {
     }
     
     // Check if item already in cart
-    $stmt = $pdo->prepare("SELECT id, quantity FROM cart WHERE user_id = ? AND livestock_id = ?");
+    $stmt = $conn->prepare("SELECT id, quantity FROM cart WHERE user_id = ? AND livestock_id = ?");
     $stmt->execute([$user_id, $livestock_id]);
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($existing) {
         // Update quantity
-        $stmt = $pdo->prepare("UPDATE cart SET quantity = quantity + 1 WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE cart SET quantity = quantity + 1 WHERE id = ?");
         $stmt->execute([$existing['id']]);
     } else {
         // Insert new item
-        $stmt = $pdo->prepare("INSERT INTO cart (user_id, livestock_id, quantity) VALUES (?, ?, 1)");
+        $stmt = $conn->prepare("INSERT INTO cart (user_id, livestock_id, quantity) VALUES (?, ?, 1)");
         $stmt->execute([$user_id, $livestock_id]);
     }
     
     // Get updated cart count
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM cart WHERE user_id = ?");
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM cart WHERE user_id = ?");
     $stmt->execute([$user_id]);
     $cart_count = $stmt->fetchColumn();
     
