@@ -1,6 +1,4 @@
 <?php
-// config.php - Database Configuration
-// session_start();
 
 $host = 'localhost';
 $db   = 'ark_sentient';
