@@ -141,28 +141,24 @@ if (!isLoggedIn()) {
             captureBtn.className = 'btn btn-success mb-2';
             preview.appendChild(captureBtn);
 
-            // Create canvas for captured image
-            const canvas = document.createElement('canvas');
-            canvas.className = 'camera-canvas-preview d-none'; // gunakan class, jangan style langsung
-            preview.appendChild(canvas);
-
             // Access webcam
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function(stream) {
                     video.srcObject = stream;
 
                     captureBtn.onclick = function() {
+                        // Create canvas only in memory, not appended to DOM
+                        const canvas = document.createElement('canvas');
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
                         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                        canvas.classList.remove('d-none'); // tampilkan canvas dengan menghapus class d-none
 
                         // Stop video stream
                         stream.getTracks().forEach(track => track.stop());
                         video.style.display = 'none';
                         captureBtn.style.display = 'none';
 
-                        // Show captured image
+                        // Show captured image (only once)
                         const img = document.createElement('img');
                         img.src = canvas.toDataURL('image/png');
                         img.className = 'img-fluid rounded mb-2 pemeriksaan-preview-img';
@@ -247,6 +243,10 @@ if (!isLoggedIn()) {
                 errorDiv.textContent = 'Terjadi kesalahan saat mengirim ke AI.';
                 preview.appendChild(errorDiv);
             });
+        });
+    </script>
+</body>
+</html>
         });
     </script>
 </body>
