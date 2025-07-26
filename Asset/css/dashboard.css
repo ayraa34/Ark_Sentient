@@ -94,3 +94,22 @@
     width: 20px;
     margin-right: 10px;
 }
+
+.pemeriksaan-cam-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 12px;
+    background: #f8f9fa;
+    max-width: 56px;
+    max-height: 56px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.pemeriksaan-cam-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+}
