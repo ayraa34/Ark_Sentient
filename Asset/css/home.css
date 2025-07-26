@@ -8,7 +8,7 @@ body {
 }
 
 .hero-section {
-  background: url("../Asset/css/home.css");
+  background: url("../img/Bg5.jpg");
   background-size: cover;
   background-position: center;
   min-height: 100vh;
